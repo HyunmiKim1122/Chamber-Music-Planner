@@ -40,14 +40,16 @@ Rules:
   - If the query asks for composers who were "inspired by", "influenced by", "students of", or otherwise came AFTER / were shaped BY a named composer X (e.g. "베토벤에게서 영감을 받은 작곡가", "composers inspired by Beethoven"), DO NOT include X himself in the result -- only the composers who received that influence.
   - If the query instead asks broadly for composers "connected to", "related to", or "associated with" X without specifying a direction (e.g. "베토벤과 연관 있는 작곡가"), you may include X himself along with contemporaries, teachers, students, or composers he influenced/was influenced by.
   - If the query explicitly asks for both X and those influenced by X (e.g. "베토벤과 그의 영향을 받은 작곡가들"), include X as well.
-- "ensemble": pick the single best match from options.ensemble, or null.
-- "era": pick the single best match from options.era, or null.
-- "mood": 0 to 3 tags from options.atmos that best capture the requested mood/atmosphere, or an empty array.
-- "audience": pick the single best match from options.audience (listener experience level implied by the query), or null.
-- "familiarity": pick the single best match from options.familiarity, or null.
-- "country": pick the single best match from options.country, or null.
+- "ensemble": pick the single best match from options.ensemble ONLY if the query specifies an instrumentation/ensemble type. Otherwise null.
+- "era": pick the single best match from options.era ONLY if the query explicitly asks about a time period (e.g. "baroque", "classical era", "contemporary"). Do NOT set this just because you happen to know which era the composer belongs to -- era should stay null for a plain composer/piece query.
+- "mood": 0 to 3 tags from options.atmos, ONLY if the query describes a mood/atmosphere/character. Otherwise an empty array.
+- "audience": pick the single best match from options.audience ONLY if the query explicitly asks about difficulty or listener experience level (e.g. "for beginners", "advanced listeners"). Do NOT infer this from how well-known or difficult the composer's music generally is. Otherwise null.
+- "familiarity": pick the single best match from options.familiarity ONLY if the query explicitly asks about how well-known/obscure the piece should be (e.g. "hidden gems", "famous pieces"). Do NOT set this just because a composer is generally famous. Otherwise null.
+- "country": pick the single best match from options.country ONLY if the query explicitly asks about a composer's nationality or a piece's country of origin. Do NOT infer this from general biographical knowledge (e.g. do not set "Austria" just because a German composer lived in Vienna). Otherwise null.
+- CRITICAL: every field above defaults to null/empty. Only set a field when the query gives you a specific, direct reason to. A short query naming just a composer and/or ensemble type should leave era, mood, audience, familiarity, and country ALL null/empty -- guessing plausible-sounding values for dimensions the user never mentioned makes the search over-narrow and can wrongly return zero results.
 - Never output a value that isn't in the corresponding provided list.
-- If the query is unclear or unrelated to any field, leave that field null/empty rather than guessing.`;
+- If the query is unclear or unrelated to any field, leave that field null/empty rather than guessing.
+- Note: this parser cannot express ranking/superlative requests ("the longest piece", "the most famous one") -- just extract whatever composer/ensemble/era/mood/audience/familiarity/country the query specifies; the ranking itself is handled elsewhere.`;
 
     const userContent = JSON.stringify({ query: text, composerList, options });
 
